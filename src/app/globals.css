@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: #f8fafc; /* Slate 50 */
+    --foreground: #0f172a; /* Slate 900 */
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
+    --primary: #0d9488; /* Teal 600 */
+    --primary-foreground: #ffffff;
+    --secondary: #7c3aed; /* Violet 600 */
+    --secondary-foreground: #ffffff;
+    --muted: #f1f5f9; /* Slate 100 */
+    --muted-foreground: #64748b; /* Slate 500 */
+    --accent: #f1f5f9;
+    --accent-foreground: #0f172a;
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --border: #cbd5e1; /* Slate 300 */
+    --input: #cbd5e1;
+    --ring: #0d9488;
+    --radius: 0.75rem;
+  }
+
+  .theme-dark {
+    --background: #09090b; /* Zinc 950 */
+    --foreground: #f4f4f5; /* Zinc 100 */
+    --card: #09090b;
+    --card-foreground: #f4f4f5;
+    --popover: #09090b;
+    --popover-foreground: #f4f4f5;
+    --primary: #0dd5c2; /* Teal 400 */
+    --primary-foreground: #09090b;
+    --secondary: #ad5bf5; /* Purple 400 */
+    --secondary-foreground: #09090b;
+    --muted: #18181b; /* Zinc 900 */
+    --muted-foreground: #a1a1aa; /* Zinc 400 */
+    --accent: #18181b;
+    --accent-foreground: #f4f4f5;
+    --destructive: #7f1d1d;
+    --destructive-foreground: #f4f4f5;
+    --border: #3f3f46; /* Zinc 700 */
+    --input: #3f3f46;
+    --ring: #0dd5c2;
+  }
+}
+
+@theme {
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-glow: glow 2s ease-in-out infinite alternate;
+  
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 10px rgba(13, 213, 194, 0.15), 0 0 20px rgba(13, 213, 194, 0.1);
+  }
+  to {
+    text-shadow: 0 0 15px rgba(13, 213, 194, 0.4), 0 0 30px rgba(13, 213, 194, 0.2);
+  }
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.theme-dark .glass-panel {
+  background: rgba(15, 15, 20, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(0, 0, 0, 0.02);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.theme-dark .glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Scrollbar customization */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.2);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.4);
+}
+
+/* Text glow styles */
+.theme-dark .text-neon-teal {
+  color: #0dd5c2;
+  text-shadow: 0 0 10px rgba(13, 213, 194, 0.3);
+}
+
+.text-neon-teal {
+  color: #0d9488;
+}
+
+.theme-dark .text-neon-purple {
+  color: #ad5bf5;
+  text-shadow: 0 0 10px rgba(173, 91, 245, 0.3);
+}
+
+.text-neon-purple {
+  color: #7c3aed;
+}

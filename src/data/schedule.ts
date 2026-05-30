@@ -6,8 +6,7 @@ export interface StudySlot {
   baseEndMinutes: number; // minutes from midnight: 10 AM = 600
   topics: string;
   trendAnalysis?: string;
-  marks?: number;
-  draftingFocus?: string;
+  breakTimeAfter?: number;
 }
 
 export interface DayPlan {
@@ -34,7 +33,6 @@ export const scheduleData: DayPlan[] = [
         baseStartMinutes: 420,
         baseEndMinutes: 600,
         topics: "Board Effectiveness, independent directors' criteria, and mandatory board committees (Composition, quorum, and powers under Companies Act vs. SEBI LODR).",
-        marks: 65,
         trendAnalysis: "Look for questions checking independent director criteria (Section 149(6) vs LODR Reg 16)."
       },
       {
@@ -52,9 +50,7 @@ export const scheduleData: DayPlan[] = [
         timeRange: "06:30 PM – 09:30 PM",
         baseStartMinutes: 1110,
         baseEndMinutes: 1290,
-        topics: "The 15-Mark Draft: Deed of Sale, Lease Deed, or Gift Deed in Question 1 or 2.",
-        draftingFocus: "Practice drafting core clauses (Consideration, Habendum, Covenant for quiet enjoyment, Testimonium) for commercial deeds.",
-        marks: 15
+        topics: "The 15-Mark Draft: Deed of Sale, Lease Deed, or Gift Deed in Question 1 or 2."
       }
     ]
   },
@@ -72,7 +68,6 @@ export const scheduleData: DayPlan[] = [
         baseStartMinutes: 420,
         baseEndMinutes: 600,
         topics: "Scope of compliance framework, establishing corporate compliance dashboards, and tracking dynamic regulatory changes.",
-        marks: 40,
         trendAnalysis: "Focus on corporate compliance framework components and dynamic compliance tracking."
       },
       {
@@ -90,9 +85,7 @@ export const scheduleData: DayPlan[] = [
         timeRange: "06:30 PM – 09:30 PM",
         baseStartMinutes: 1110,
         baseEndMinutes: 1290,
-        topics: "Pleadings & Court Formats: Plaint or a Written Statement for a recovery suit.",
-        draftingFocus: "Master the 'Verification' and 'Affidavit' components that follow pleadings. This is a regular 10-mark question.",
-        marks: 10
+        topics: "Pleadings & Court Formats: Plaint or a Written Statement for a recovery suit."
       }
     ]
   },
@@ -110,7 +103,6 @@ export const scheduleData: DayPlan[] = [
         baseStartMinutes: 420,
         baseEndMinutes: 600,
         topics: "Section 135 in absolute detail. Net Worth (>= 500 Cr), Turnover (>= 1000 Cr), and Net Profit (>= 5 Cr) criteria. Practice the 3-year average net profit calculation.",
-        marks: 50,
         trendAnalysis: "Practice adjustments under Section 198 (exclusion of overseas branch profits and inter-corporate dividends)."
       },
       {
@@ -128,9 +120,7 @@ export const scheduleData: DayPlan[] = [
         timeRange: "06:30 PM – 09:30 PM",
         baseStartMinutes: 1110,
         baseEndMinutes: 1290,
-        topics: "Company Law Drafts: Board Resolutions and AGM Notices.",
-        draftingFocus: "Practice drafting Board Resolutions (approving financial statements, shifting registered office) and notices for Annual General Meetings (AGM).",
-        marks: 10
+        topics: "Company Law Drafts: Board Resolutions and AGM Notices."
       }
     ]
   },
@@ -148,7 +138,6 @@ export const scheduleData: DayPlan[] = [
         baseStartMinutes: 420,
         baseEndMinutes: 600,
         topics: "Secretarial Audit applicability, the process of conducting the audit, and the structure/modules of Form MR-3. Auditor’s liability for false statements.",
-        marks: 60,
         trendAnalysis: "Applicability is tested: Listed companies, Public companies with Capital >= 50Cr or Turnover >= 250Cr, or outstanding loans >= 100Cr."
       },
       {
@@ -166,9 +155,7 @@ export const scheduleData: DayPlan[] = [
         timeRange: "06:30 PM – 09:30 PM",
         baseStartMinutes: 1110,
         baseEndMinutes: 1290,
-        topics: "Appeals & Petitions: Formatting of an Appeal to NCLAT or SAT.",
-        draftingFocus: "Memorize the standard format for indexing, stating the grounds of appeal, and the prayer clause.",
-        marks: 10
+        topics: "Appeals & Petitions: Formatting of an Appeal to NCLAT or SAT."
       }
     ]
   },
@@ -186,7 +173,6 @@ export const scheduleData: DayPlan[] = [
         baseStartMinutes: 420,
         baseEndMinutes: 600,
         topics: "Risk Management frameworks (ERM), sustainability reporting models (GRI, Integrated Reporting framework), and the mandatory pillars of BRSR Core.",
-        marks: 35,
         trendAnalysis: "Master the 9 principles of National Guidelines on Responsible Business Conduct (NGRBC) which form BRSR."
       },
       {
@@ -196,7 +182,6 @@ export const scheduleData: DayPlan[] = [
         baseStartMinutes: 780,
         baseEndMinutes: 960,
         topics: "Social Governance frameworks, Social Stock Exchange (SSE) listing requirements for NPOs, and the methodologies used in a Social Audit.",
-        marks: 50,
         trendAnalysis: "Focus on SSE eligibility for NPOs (registration, annual disclosure) and social impact assessment methods."
       },
       {
@@ -205,9 +190,7 @@ export const scheduleData: DayPlan[] = [
         timeRange: "06:30 PM – 09:30 PM",
         baseStartMinutes: 1110,
         baseEndMinutes: 1290,
-        topics: "Power of Attorney & Miscellaneous Drafts: General vs. Special Power of Attorney, Indemnity Bonds, and Guarantee Deeds.",
-        draftingFocus: "Practice drafting General vs. Special POA, Indemnity Bonds, and Guarantee Deeds. Compulsory 5-mark short-notes.",
-        marks: 5
+        topics: "Power of Attorney & Miscellaneous Drafts: General vs. Special Power of Attorney, Indemnity Bonds, and Guarantee Deeds."
       }
     ]
   },
@@ -242,8 +225,7 @@ export const scheduleData: DayPlan[] = [
         timeRange: "06:30 PM – 09:30 PM",
         baseStartMinutes: 1110,
         baseEndMinutes: 1290,
-        topics: "Art of Advocacy & Appearances. Revise the theoretical chapters of Drafting.",
-        draftingFocus: "Study professional conduct, dress code (gown, bands), courtroom etiquette, and regular applications before NCLT, NCLAT, and CCI."
+        topics: "Art of Advocacy & Appearances. Revise the theoretical chapters of Drafting."
       }
     ]
   },
@@ -278,8 +260,7 @@ export const scheduleData: DayPlan[] = [
         timeRange: "06:30 PM – 09:30 PM",
         baseStartMinutes: 1110,
         baseEndMinutes: 1290,
-        topics: "Deed Skeleton Layout Visualization.",
-        draftingFocus: "Visualize the skeleton layout of drafts. Ensure you can replicate the exact opening recitals, testatum, habendum, redendum, covenants, and testimonium."
+        topics: "Deed Skeleton Layout Visualization."
       }
     ]
   }

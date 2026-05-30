@@ -2,59 +2,62 @@
 
 @layer base {
   :root {
-    --background: #f8fafc; /* Slate 50 */
+    --background: #f8fafc; /* Extremely clean light slate bg */
     --foreground: #0f172a; /* Slate 900 */
-    --card: #ffffff;
+    --card: #ffffff; /* Solid pure white cards */
     --card-foreground: #0f172a;
-    --popover: #ffffff;
+    --popover: #ffffff; /* Solid white popovers for high contrast */
     --popover-foreground: #0f172a;
-    --primary: #0d9488; /* Teal 600 */
+    --primary: #0d9488; /* Premium Teal 600 */
     --primary-foreground: #ffffff;
-    --secondary: #7c3aed; /* Violet 600 */
+    --secondary: #4f46e5; /* Premium Indigo 600 */
     --secondary-foreground: #ffffff;
     --muted: #f1f5f9; /* Slate 100 */
-    --muted-foreground: #64748b; /* Slate 500 */
-    --accent: #f1f5f9;
+    --muted-foreground: #475569; /* Slate 600 - higher contrast */
+    --accent: #e2e8f0; /* Slate 200 */
     --accent-foreground: #0f172a;
-    --destructive: #ef4444;
+    --destructive: #dc2626; /* Deep Red */
     --destructive-foreground: #ffffff;
-    --border: #cbd5e1; /* Slate 300 */
-    --input: #cbd5e1;
+    --border: #cbd5e1; /* defined slate-300 border for sharp grids */
+    --input: #ffffff;
     --ring: #0d9488;
-    --radius: 0.75rem;
+    --radius: 0px; /* Zero radius */
+    --bg-gradient: none; /* Solid clean background */
   }
 
   .theme-dark {
-    --background: #09090b; /* Zinc 950 */
-    --foreground: #f4f4f5; /* Zinc 100 */
-    --card: #09090b;
-    --card-foreground: #f4f4f5;
-    --popover: #09090b;
-    --popover-foreground: #f4f4f5;
-    --primary: #0dd5c2; /* Teal 400 */
-    --primary-foreground: #09090b;
-    --secondary: #ad5bf5; /* Purple 400 */
-    --secondary-foreground: #09090b;
-    --muted: #18181b; /* Zinc 900 */
+    --background: #09090b; /* Solid zinc-950 black */
+    --foreground: #fafafa; /* Zinc 50 */
+    --card: #18181b; /* Solid zinc-900 card background */
+    --card-foreground: #fafafa;
+    --popover: #18181b; /* Solid zinc-900 modal/popover */
+    --popover-foreground: #fafafa;
+    --primary: #14b8a6; /* Ocean Teal 500 */
+    --primary-foreground: #ffffff;
+    --secondary: #6366f1; /* Vibrant Indigo 500 */
+    --secondary-foreground: #ffffff;
+    --muted: #27272a; /* Zinc 800 */
     --muted-foreground: #a1a1aa; /* Zinc 400 */
-    --accent: #18181b;
-    --accent-foreground: #f4f4f5;
-    --destructive: #7f1d1d;
-    --destructive-foreground: #f4f4f5;
-    --border: #3f3f46; /* Zinc 700 */
-    --input: #3f3f46;
-    --ring: #0dd5c2;
+    --accent: #27272a;
+    --accent-foreground: #fafafa;
+    --destructive: #ef4444; /* Vibrant Rose Red */
+    --destructive-foreground: #ffffff;
+    --border: #3f3f46; /* defined zinc-700 border */
+    --input: #18181b;
+    --ring: #14b8a6;
+    --bg-gradient: none; /* Solid clean dark background */
   }
 }
 
 @theme {
   --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  --animate-glow: glow 2s ease-in-out infinite alternate;
   
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-border: var(--border);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
@@ -64,50 +67,46 @@
   --color-secondary-foreground: var(--secondary-foreground);
 }
 
-@keyframes glow {
-  from {
-    text-shadow: 0 0 10px rgba(13, 213, 194, 0.15), 0 0 20px rgba(13, 213, 194, 0.1);
-  }
-  to {
-    text-shadow: 0 0 15px rgba(13, 213, 194, 0.4), 0 0 30px rgba(13, 213, 194, 0.2);
-  }
-}
-
 body {
   margin: 0;
   padding: 0;
   background-color: var(--background);
   color: var(--foreground);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Glassmorphism Classes */
+/* Force border-radius to 0px on EVERYTHING to satisfy 'no curves' requirement */
+*, ::before, ::after {
+  border-radius: 0px !important;
+}
+
+/* Fix native calendar icon visibility in dark mode */
+.theme-dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Solid Panel Classes for high contrast and modern aesthetics */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--popover);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 .theme-dark .glass-panel {
-  background: rgba(15, 15, 20, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--popover);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
 }
 
 .glass-card {
-  background: rgba(0, 0, 0, 0.02);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  background: var(--card);
+  border: 1px solid var(--border);
 }
 
 .theme-dark .glass-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--card);
+  border: 1px solid var(--border);
 }
 
 /* Scrollbar customization */
@@ -121,29 +120,76 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.2);
-  border-radius: 9999px;
+  background: var(--border);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(156, 163, 175, 0.4);
+  background: var(--muted-foreground);
 }
 
-/* Text glow styles */
-.theme-dark .text-neon-teal {
-  color: #0dd5c2;
-  text-shadow: 0 0 10px rgba(13, 213, 194, 0.3);
-}
-
+/* Soft, readable semantic colors */
 .text-neon-teal {
-  color: #0d9488;
+  color: var(--primary);
 }
 
-.theme-dark .text-neon-purple {
-  color: #ad5bf5;
-  text-shadow: 0 0 10px rgba(173, 91, 245, 0.3);
+.theme-dark .text-neon-teal {
+  color: var(--primary);
 }
 
 .text-neon-purple {
-  color: #7c3aed;
+  color: var(--secondary);
 }
+
+.theme-dark .text-neon-purple {
+  color: var(--secondary);
+}
+
+/* Horizontal Marquee Animations */
+@keyframes marquee-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-marquee-left {
+  display: flex;
+  width: max-content;
+  animation: marquee-left 25s linear infinite;
+}
+
+.animate-marquee-right {
+  display: flex;
+  width: max-content;
+  animation: marquee-right 25s linear infinite;
+}
+
+/* Sidebar Calculator Responsive Overrides */
+.sidebar-calculator .grid-cols-2,
+.sidebar-calculator .grid-cols-3 {
+  grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+}
+.sidebar-calculator .col-span-2,
+.sidebar-calculator .sm\:col-span-1 {
+  grid-column: span 1 / span 1 !important;
+}
+/* Ensure the components look clean inside sidebar */
+.sidebar-calculator input,
+.sidebar-calculator select {
+  font-size: 11px !important;
+  padding: 6px 8px !important;
+}
+.sidebar-calculator label {
+  font-size: 9px !important;
+}
+.sidebar-calculator h3 {
+  font-size: 13px !important;
+}
+.sidebar-calculator span {
+  font-size: 9px !important;
+}
+
+

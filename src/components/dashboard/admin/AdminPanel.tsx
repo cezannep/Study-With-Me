@@ -24,6 +24,10 @@ export default function AdminPanel() {
     formatSecondsToMMSS
   } = useDashboardActions();
 
+  const liveInspectPlan = adminInspectPlan
+    ? (adminSelectedStudent?.plans?.find((p: any) => p.id === adminInspectPlan.id) || adminInspectPlan)
+    : null;
+
   return (
     <div className="h-screen flex flex-col bg-zinc-950 text-zinc-100 overflow-hidden font-sans">
       {/* Header */}
@@ -267,22 +271,22 @@ export default function AdminPanel() {
       </div>
 
       {/* Admin Inspect Plan Modal */}
-      {adminInspectPlan && (
+      {liveInspectPlan && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
             {/* Header */}
             <div className="p-5 border-b border-zinc-800 flex items-center justify-between bg-zinc-950">
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-base sm:text-lg font-bold text-white uppercase tracking-wide font-sans">{adminInspectPlan.name}</h2>
-                  {adminSelectedStudent.activePlanId === adminInspectPlan.id && (
+                  <h2 className="text-base sm:text-lg font-bold text-white uppercase tracking-wide font-sans">{liveInspectPlan.name}</h2>
+                  {adminSelectedStudent.activePlanId === liveInspectPlan.id && (
                     <span className="text-[9px] bg-primary text-primary-foreground font-bold px-1.5 py-0.5 uppercase tracking-wide font-sans">
                       Active Plan
                     </span>
                   )}
                 </div>
                 <p className="text-xs text-zinc-400 font-sans mt-0.5">
-                  Date Range: {adminInspectPlan.startDate} to {adminInspectPlan.endDate}
+                  Date Range: {liveInspectPlan.startDate} to {liveInspectPlan.endDate}
                 </p>
               </div>
               <button
@@ -296,19 +300,19 @@ export default function AdminPanel() {
 
             {/* Scrollable Content: List of Days and Slots */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6 font-sans">
-              {adminInspectPlan.days && adminInspectPlan.days.length > 0 ? (
-                adminInspectPlan.days.map((day: any) => {
+              {liveInspectPlan.days && liveInspectPlan.days.length > 0 ? (
+                liveInspectPlan.days.map((day: any) => {
                   const activeSlots = day.slots.filter((s: any) => !adminSelectedStudent.progress?.deletedSlots?.[s.id]);
                   if (activeSlots.length === 0) return null;
 
-                  const dayStudySec = adminSelectedStudent.dailyStudyTime?.[`${adminInspectPlan.id}_${day.id}`] || 0;
-                  const dayBreakSec = adminSelectedStudent.dailyBreakTime?.[`${adminInspectPlan.id}_${day.id}`] || 0;
+                  const dayStudySec = adminSelectedStudent.dailyStudyTime?.[`${liveInspectPlan.id}_${day.id}`] || 0;
+                  const dayBreakSec = adminSelectedStudent.dailyBreakTime?.[`${liveInspectPlan.id}_${day.id}`] || 0;
 
                   return (
                     <div key={day.id} className="space-y-3">
                       <div className="flex items-center justify-between border-b border-zinc-800 pb-1.5">
                         <h3 className="text-xs font-bold text-primary uppercase tracking-wider font-sans">
-                          Day {day.id}: {day.name}
+                          Day {day.id}: {day.dayName || day.name}
                         </h3>
                         <div className="flex items-center gap-3 text-[10px]">
                           {dayStudySec > 0 && (
@@ -358,10 +362,10 @@ export default function AdminPanel() {
                                     {slot.name}
                                   </h4>
                                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[10px] text-zinc-400 font-sans">
-                                    {slot.startTime && slot.endTime && (
+                                    {slot.timeRange && (
                                       <p className="flex items-center gap-1 font-sans">
                                         <Clock className="w-3 h-3 text-zinc-500" />
-                                        {slot.startTime} – {slot.endTime}
+                                        {slot.timeRange}
                                       </p>
                                     )}
                                     {(slotStudySec > 0 || slotBreakSec > 0) && (

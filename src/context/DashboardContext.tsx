@@ -225,6 +225,13 @@ interface DashboardActionsContextProps {
 const DashboardStateContext = createContext<DashboardStateContextProps | undefined>(undefined);
 const DashboardActionsContext = createContext<DashboardActionsContextProps | undefined>(undefined);
 
+async function hashPassword(password: string): Promise<string> {
+  const msgBuffer = new TextEncoder().encode(password);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
 export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdminLoginOpen?: boolean }> = ({ children, initialAdminLoginOpen = false }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [isRestored, setIsRestored] = useState(false);
@@ -306,7 +313,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
 
   // New Study Plan state variables
   const [plans, setPlans] = useState<Plan[]>([]);
-  const [activePlanId, setActivePlanId] = useState<string>("plan-default");
+  const [activePlanId, setActivePlanId] = useState<string>("");
   const [planToDelete, setPlanToDelete] = useState<string | null>(null);
   const [isAddPlanOpen, setIsAddPlanOpen] = useState<boolean>(false);
   const [newPlanName, setNewPlanName] = useState<string>("");
@@ -360,6 +367,12 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
   // Client-side mount check to prevent white hydration flicker
   useEffect(() => {
     setIsMounted(true);
+    if (typeof window !== "undefined") {
+      const savedAdminMode = sessionStorage.getItem("is_admin_mode") === "true";
+      if (savedAdminMode) {
+        setIsAdminMode(true);
+      }
+    }
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1024);
     };
@@ -398,7 +411,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
     const storedPlans = localStorage.getItem("study_plans");
     const storedActivePlanId = localStorage.getItem("active_plan_id");
     let currentPlans: Plan[] = [];
-    let currentActivePlanId = "plan-default";
+    let currentActivePlanId = "";
 
     if (storedPlans) {
       try {
@@ -408,21 +421,10 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
       }
     }
 
-    if (currentPlans.length === 0) {
-      const defaultPlan: Plan = {
-        id: "plan-default",
-        name: "7-Day Study Roadmap",
-        startDate: "2026-05-24",
-        endDate: "2026-05-30",
-        days: JSON.parse(JSON.stringify(scheduleData))
-      };
-      currentPlans = [defaultPlan];
-      localStorage.setItem("study_plans", JSON.stringify(currentPlans));
-    }
-
     if (storedActivePlanId) {
       currentActivePlanId = storedActivePlanId;
-    } else {
+    } else if (currentPlans.length > 0) {
+      currentActivePlanId = currentPlans[0].id;
       localStorage.setItem("active_plan_id", currentActivePlanId);
     }
 
@@ -718,14 +720,14 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
             });
 
             let restorePlans = cloudPlans;
+            let restoreActivePlanId = cloudActivePlanId;
             if (restorePlans.length === 0) {
-              const defaultPlan = await getDefaultRoadmapFromFirebase();
-              restorePlans = [defaultPlan];
+              restoreActivePlanId = "";
             }
 
             setCloudDataToRestore({
               plans: restorePlans,
-              activePlanId: cloudActivePlanId,
+              activePlanId: restoreActivePlanId,
               progress: cloudProgress
             });
 
@@ -738,11 +740,10 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
               localStorage.removeItem("active_plan_id");
               localStorage.removeItem("icsi_study_planner");
             } else {
-              const defaultPlan = await getDefaultRoadmapFromFirebase();
-              const defaultPlans = [defaultPlan];
+              const defaultPlans: Plan[] = [];
               await setDoc(userDocRef, {
                 plans: defaultPlans,
-                activePlanId: "plan-default",
+                activePlanId: "",
                 progress: DEFAULT_PROGRESS,
                 totalStudyTime: 0,
                 totalBreakTime: 0,
@@ -751,7 +752,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
                 dailyStudyTime: {},
                 dailyBreakTime: {}
               }, { merge: true });
-              applyProgressAndPlans(defaultPlans, "plan-default", DEFAULT_PROGRESS);
+              applyProgressAndPlans(defaultPlans, "", DEFAULT_PROGRESS);
             }
             setAuthLoading(false);
           }
@@ -802,6 +803,17 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
     });
 
     return () => unsubscribe();
+  }, [isAdminMode]);
+
+  // Sync isAdminMode to sessionStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (isAdminMode) {
+        sessionStorage.setItem("is_admin_mode", "true");
+      } else {
+        sessionStorage.removeItem("is_admin_mode");
+      }
+    }
   }, [isAdminMode]);
 
   // Keep adminSelectedStudent in sync with studentsList
@@ -975,7 +987,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
     if (auth.currentUser) {
       const userDocRef = doc(db, "users", auth.currentUser.uid);
       const updateData: any = { plans: updatedPlans };
-      if (nextActivePlanId) {
+      if (nextActivePlanId !== undefined) {
         updateData.activePlanId = nextActivePlanId;
       }
       updateDoc(userDocRef, updateData).catch(err => console.error("Firebase plans sync failed:", err));
@@ -1001,7 +1013,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
       setUser(null);
       setIsDemoMode(false);
       setPlans([]);
-      setActivePlanId("plan-default");
+      setActivePlanId("");
       setProgress(DEFAULT_PROGRESS);
       setActiveSlotId(null);
       setIsTimerRunning(false);
@@ -1126,18 +1138,59 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
   const handleAdminLogin = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setAdminLoginError(null);
-    if (!auth.currentUser || auth.currentUser.email !== "sunuhacker@gmail.com") {
-      setAdminLoginError("Access denied. Only sunuhacker@gmail.com can log in as admin.");
+    
+    const currentUser = auth.currentUser;
+    if (!currentUser || !currentUser.email) {
+      setAdminLoginError("Access denied. Please authenticate with Google first.");
       return;
     }
-    if (adminUsername === "admin" && adminPassword === "cezan123") {
-      setIsAdminMode(true);
-      setIsAdminLoginOpen(false);
-      setAdminUsername("");
-      setAdminPassword("");
-      await fetchStudents();
-    } else {
-      setAdminLoginError("Invalid username or password.");
+
+    const adminEmail = currentUser.email;
+
+    try {
+      // 1. Fetch admin document from Firestore
+      const adminDocRef = doc(db, "admins", adminEmail);
+      let adminDoc = await getDoc(adminDocRef);
+
+      // 2. If it does not exist, and it is the default admin email, seed the document
+      if (!adminDoc.exists()) {
+        if (adminEmail === "sunuhacker@gmail.com" || adminEmail === "cezanne.p.cez@gmail.com") {
+          const defaultHash = await hashPassword("cezan123");
+          await setDoc(adminDocRef, {
+            username: "admin",
+            passwordHash: defaultHash,
+            email: adminEmail,
+            createdAt: new Date().toISOString()
+          });
+          adminDoc = await getDoc(adminDocRef); // re-fetch
+        } else {
+          setAdminLoginError("Access denied. Your account is not configured as an administrator.");
+          return;
+        }
+      }
+
+      const adminData = adminDoc.data();
+      if (!adminData) {
+        setAdminLoginError("Admin configuration could not be loaded.");
+        return;
+      }
+
+      // 3. Hash the entered password
+      const inputHash = await hashPassword(adminPassword);
+
+      // 4. Compare username and passwordHash
+      if (adminUsername === adminData.username && inputHash === adminData.passwordHash) {
+        setIsAdminMode(true);
+        setIsAdminLoginOpen(false);
+        setAdminUsername("");
+        setAdminPassword("");
+        await fetchStudents();
+      } else {
+        setAdminLoginError("Invalid username or password.");
+      }
+    } catch (err: any) {
+      console.error("Admin Login Error: ", err);
+      setAdminLoginError(`Authentication failed: ${err.message || err}`);
     }
   }, [adminUsername, adminPassword, fetchStudents]);
 
@@ -1312,15 +1365,12 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
     const updatedPlans = plans.filter(p => p.id !== planId);
 
     if (updatedPlans.length === 0) {
-      setAuthLoading(true);
-      const defaultPlan = await getDefaultRoadmapFromFirebase();
-      const resetPlans = [defaultPlan];
-      savePlans(resetPlans, defaultPlan.id);
-      setActivePlanId(defaultPlan.id);
+      savePlans([], "");
+      setActivePlanId("");
       if (!auth.currentUser) {
-        localStorage.setItem("active_plan_id", defaultPlan.id);
+        localStorage.setItem("active_plan_id", "");
       }
-      setSelectedDayId(defaultPlan.days[0].id);
+      setSelectedDayId(1);
 
       saveProgress({
         ...progress,
@@ -1330,7 +1380,6 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
         scheduleDelay: {},
         deletedSlots: {},
       });
-      setAuthLoading(false);
     } else {
       const remainingPlan = updatedPlans[0];
       savePlans(updatedPlans, remainingPlan.id);
@@ -1434,12 +1483,10 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
       theme: progress.theme,
     });
 
-    setAuthLoading(true);
-    const defaultPlan = await getDefaultRoadmapFromFirebase();
-    savePlans([defaultPlan], defaultPlan.id);
-    setActivePlanId(defaultPlan.id);
+    savePlans([], "");
+    setActivePlanId("");
     if (!auth.currentUser) {
-      localStorage.setItem("active_plan_id", defaultPlan.id);
+      localStorage.setItem("active_plan_id", "");
     }
     setSelectedDayId(1);
 
@@ -1449,8 +1496,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
     setBreakSeconds(0);
     setIsResetConfirmOpen(false);
     setIsTimerOnBreak(false);
-    setAuthLoading(false);
-  }, [progress, saveProgress, savePlans, getDefaultRoadmapFromFirebase]);
+  }, [progress, saveProgress, savePlans]);
 
   const handleAddCustomSlot = useCallback((e: React.FormEvent) => {
     e.preventDefault();
@@ -1919,14 +1965,13 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode; initialAdm
     }
   }, [newSlotDayId, plans, activePlanId, isAddSlotOpen, getFreeGapsForDay, minutesToTimeString]);
 
-  // Derived Values
   const activePlan = useMemo(() => {
     return plans.find(p => p.id === activePlanId) || plans[0] || {
-      id: "plan-default",
-      name: "7-Day Study Roadmap",
-      startDate: "2026-05-24",
-      endDate: "2026-05-30",
-      days: scheduleData
+      id: "plan-empty",
+      name: "No Plan Created",
+      startDate: "",
+      endDate: "",
+      days: []
     };
   }, [plans, activePlanId]);
 

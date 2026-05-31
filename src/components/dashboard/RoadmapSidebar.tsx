@@ -59,72 +59,74 @@ export default function RoadmapSidebar() {
         </button>
 
         {/* Plan Selector Tag/Button */}
-        <div className="relative w-full">
-          <button
-            type="button"
-            onClick={() => setIsPlansPanelOpen(!isPlansPanelOpen)}
-            className={`flex items-center justify-center bg-primary/10 border border-primary/20 hover:bg-primary/20 text-primary transition-all cursor-pointer shadow-xs ${
-              isEffectiveRoadmapCollapsed 
-                ? "w-10 h-10 rounded-xl mx-auto" 
-                : "w-full px-3 py-2 rounded-lg justify-between gap-2 text-xs font-bold"
-            }`}
-            title={isEffectiveRoadmapCollapsed ? `Plan: ${activePlan.name}` : undefined}
-          >
-            {isEffectiveRoadmapCollapsed ? (
-              <BookOpen className="w-4 h-4 shrink-0" />
-            ) : (
-              <>
-                <span className="truncate">{activePlan.name}</span>
-                <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${isPlansPanelOpen ? "rotate-90" : ""}`} />
-              </>
+        {plans.length > 0 && (
+          <div className="relative w-full">
+            <button
+              type="button"
+              onClick={() => setIsPlansPanelOpen(!isPlansPanelOpen)}
+              className={`flex items-center justify-center bg-primary/10 border border-primary/20 hover:bg-primary/20 text-primary transition-all cursor-pointer shadow-xs ${
+                isEffectiveRoadmapCollapsed 
+                  ? "w-10 h-10 rounded-xl mx-auto" 
+                  : "w-full px-3 py-2 rounded-lg justify-between gap-2 text-xs font-bold"
+              }`}
+              title={isEffectiveRoadmapCollapsed ? `Plan: ${activePlan.name}` : undefined}
+            >
+              {isEffectiveRoadmapCollapsed ? (
+                <BookOpen className="w-4 h-4 shrink-0" />
+              ) : (
+                <>
+                  <span className="truncate">{activePlan.name}</span>
+                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${isPlansPanelOpen ? "rotate-90" : ""}`} />
+                </>
+              )}
+            </button>
+            
+            {/* Custom Plans Panel / Dropdown */}
+            {isPlansPanelOpen && (
+              <div className={`absolute top-full z-50 bg-popover border border-border rounded-xl shadow-2xl p-3 space-y-2.5 max-h-72 overflow-y-auto text-foreground origin-top animate-in fade-in-50 slide-in-from-top-2 duration-150 ${
+                isEffectiveRoadmapCollapsed ? "left-0 w-64 mt-2" : "left-0 right-0 mt-1.5"
+              }`}>
+                <div className="text-[9px] font-bold text-muted-foreground uppercase pb-1 border-b border-border">
+                  Select Study Plan
+                </div>
+                <div className="space-y-1">
+                  {plans.map((p) => {
+                    const isActive = p.id === activePlanId;
+                    return (
+                      <div key={p.id} className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleSwitchPlan(p.id);
+                            setIsPlansPanelOpen(false);
+                          }}
+                          className={`flex-1 text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                            isActive 
+                              ? "bg-primary text-primary-foreground font-semibold shadow-xs" 
+                              : "bg-muted/40 hover:bg-muted text-foreground"
+                          }`}
+                        >
+                          {p.name}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeletePlan(p.id);
+                          }}
+                          className="p-1.5 rounded-lg border border-transparent text-muted-foreground hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+                          title="Delete Plan"
+                        >
+                          <Trash className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             )}
-          </button>
-          
-          {/* Custom Plans Panel / Dropdown */}
-          {isPlansPanelOpen && (
-            <div className={`absolute top-full z-50 bg-popover border border-border rounded-xl shadow-2xl p-3 space-y-2.5 max-h-72 overflow-y-auto text-foreground origin-top animate-in fade-in-50 slide-in-from-top-2 duration-150 ${
-              isEffectiveRoadmapCollapsed ? "left-0 w-64 mt-2" : "left-0 right-0 mt-1.5"
-            }`}>
-              <div className="text-[9px] font-bold text-muted-foreground uppercase pb-1 border-b border-border">
-                Select Study Plan
-              </div>
-              <div className="space-y-1">
-                {plans.map((p) => {
-                  const isActive = p.id === activePlanId;
-                  return (
-                    <div key={p.id} className="flex items-center gap-1.5 group">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleSwitchPlan(p.id);
-                          setIsPlansPanelOpen(false);
-                        }}
-                        className={`flex-1 text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                          isActive 
-                            ? "bg-primary text-primary-foreground font-semibold shadow-xs" 
-                            : "bg-muted/40 hover:bg-muted text-foreground"
-                        }`}
-                      >
-                        {p.name}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeletePlan(p.id);
-                        }}
-                        className="p-1.5 rounded-lg border border-transparent text-muted-foreground hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
-                        title="Delete Plan"
-                      >
-                        <Trash className="w-3 h-3" />
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
       <div className={`flex-1 overflow-y-auto space-y-2.5 w-full ${isEffectiveRoadmapCollapsed ? "flex flex-col items-center" : "pr-1"}`}>
         {activePlan.days.map((day) => {
@@ -160,11 +162,10 @@ export default function RoadmapSidebar() {
               }`}
               title={isEffectiveRoadmapCollapsed ? `${day.title} (${completedOnDay}/${dayTotalSlotsCount} Slots)` : undefined}
             >
-              {/* Decorative glowing gradient block on hover/active */}
               {isSelected && (
                 <div className={isEffectiveRoadmapCollapsed 
-                  ? "absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-400 to-purple-500"
-                  : "absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-teal-400 to-purple-500"
+                  ? "absolute bottom-0 left-0 right-0 h-1 bg-[#14B8A6]"
+                  : "absolute top-0 left-0 w-1.5 h-full bg-[#14B8A6]"
                 } />
               )}
 

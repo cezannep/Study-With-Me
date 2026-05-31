@@ -62,8 +62,13 @@ export default function MR3Checker() {
         reason = "Deemed Public Company (subsidiary of public) but does not meet the thresholds.";
       }
     } else {
-      isApplicable = false;
-      reason = "Independent private companies are exempt from mandatory Secretarial Audit under Section 204.";
+      const loanOk = loans >= 100;
+      isApplicable = loanOk;
+      if (isApplicable) {
+        reason = `Mandatory under MCA Rule 9(1)(c) amendment for private companies with Outstanding Loans/Borrowings (₹ ${loans} Cr ≥ ₹100 Cr).`;
+      } else {
+        reason = "Independent private company with outstanding loans/borrowings < ₹100 Cr (exempt from mandatory Secretarial Audit).";
+      }
     }
   }
 
@@ -140,6 +145,20 @@ export default function MR3Checker() {
               />
               <span className="text-[8px] text-muted-foreground">Limit: ≥ ₹100 Cr</span>
             </div>
+          </div>
+        )}
+
+        {companyType === "private" && !isSubsidiaryOfPublic && (
+          <div className="w-1/3 animate-in fade-in duration-150">
+            <label className="block text-[10px] text-muted-foreground mb-1">O/s Loans (Cr)</label>
+            <input
+              type="number"
+              value={outstandingLoans}
+              onChange={(e) => setOutstandingLoans(e.target.value)}
+              placeholder="e.g. 110"
+              className="w-full px-2 py-1.5 text-xs bg-black/5 dark:bg-white/5 border border-border rounded focus:outline-none focus:border-violet-400 text-foreground placeholder:text-muted-foreground"
+            />
+            <span className="text-[8px] text-muted-foreground">Limit: ≥ ₹100 Cr</span>
           </div>
         )}
       </div>

@@ -17,62 +17,87 @@ export default function BoardValidator() {
   const errors: string[] = [];
   const passes: string[] = [];
 
-  // Rule 1: Board Size (Reg 17(1)(c))
-  // At least 6 directors for Top 2000 listed entities
-  const minRequiredDirectors = isTop2000 ? 6 : 3;
-  if (totalDirectors < minRequiredDirectors) {
-    errors.push(`Board size is too small. Current: ${totalDirectors}. Required minimum: ${minRequiredDirectors} (for top 2000 listed entities).`);
-  } else {
-    passes.push(`Board size is valid (${totalDirectors} directors).`);
+  // 0. Consistency checks
+  let isConsistent = true;
+  if (nonExecutiveDirectors > totalDirectors) {
+    errors.push(`Consistency Error: Non-Executive Directors (${nonExecutiveDirectors}) cannot exceed Total Directors (${totalDirectors}).`);
+    isConsistent = false;
+  }
+  if (independentDirectors > nonExecutiveDirectors) {
+    errors.push(`Consistency Error: Independent Directors (${independentDirectors}) cannot exceed Non-Executive Directors (${nonExecutiveDirectors}) (independent directors must be non-executive).`);
+    isConsistent = false;
+  }
+  if (womenDirectors > totalDirectors) {
+    errors.push(`Consistency Error: Women Directors (${womenDirectors}) cannot exceed Total Directors (${totalDirectors}).`);
+    isConsistent = false;
+  }
+  if (independentWomenDirectors > womenDirectors) {
+    errors.push(`Consistency Error: Independent Women Directors (${independentWomenDirectors}) cannot exceed Women Directors (${womenDirectors}).`);
+    isConsistent = false;
+  }
+  if (independentWomenDirectors > independentDirectors) {
+    errors.push(`Consistency Error: Independent Women Directors (${independentWomenDirectors}) cannot exceed Independent Directors (${independentDirectors}).`);
+    isConsistent = false;
   }
 
-  // Rule 2: Executive vs Non-Executive (Reg 17(1)(a))
-  // Board must have at least 50% non-executive directors
-  const halfDirectors = Math.ceil(totalDirectors / 2);
-  if (nonExecutiveDirectors < halfDirectors) {
-    errors.push(`Insufficient Non-Executive Directors. Current: ${nonExecutiveDirectors}. Required minimum: ${halfDirectors} (at least 50% of Board).`);
-  } else {
-    passes.push(`Non-Executive composition is valid (${nonExecutiveDirectors} / ${totalDirectors} are Non-Executive).`);
-  }
-
-  // Rule 3: Woman Director and Independent Woman Director (Reg 17(1)(a))
-  // All listed entities: at least 1 woman director.
-  // Top 1000 listed entities: at least 1 independent woman director.
-  if (womenDirectors < 1) {
-    errors.push("Missing Woman Director. Every listed entity must have at least 1 woman director.");
-  } else {
-    passes.push(`Has ${womenDirectors} woman director(s).`);
-  }
-
-  if (isTop1000) {
-    if (independentWomenDirectors < 1) {
-      errors.push("Missing Independent Woman Director. Top 1000 listed entities must have at least 1 independent woman director.");
+  if (isConsistent) {
+    // Rule 1: Board Size (Reg 17(1)(c))
+    // At least 6 directors for Top 2000 listed entities
+    const minRequiredDirectors = isTop2000 ? 6 : 3;
+    if (totalDirectors < minRequiredDirectors) {
+      errors.push(`Board size is too small. Current: ${totalDirectors}. Required minimum: ${minRequiredDirectors} (for top 2000 listed entities).`);
     } else {
-      passes.push("Has at least 1 independent woman director (Top 1000 check passed).");
+      passes.push(`Board size is valid (${totalDirectors} directors).`);
     }
-  }
 
-  // Rule 4: Independent Directors ratio (Reg 17(1)(b))
-  // - If Chairperson is Regular Non-Executive (not promoter, not related to promoter): Min 1/3rd Independent
-  // - If Chairperson is Executive, or Regular Non-Executive but Promoter/Related: Min 50% Independent
-  let requiredIDRatio = 0.5;
-  let reasonID = "";
-  if (chairpersonType === "non_exec_regular") {
-    requiredIDRatio = 1 / 3;
-    reasonID = "Chairperson is non-executive & unrelated to promoters (Min 1/3rd Independent required)";
-  } else if (chairpersonType === "executive") {
-    requiredIDRatio = 0.5;
-    reasonID = "Chairperson is executive (Min 50% Independent required)";
-  } else if (chairpersonType === "non_exec_promoter") {
-    requiredIDRatio = 0.5;
-    reasonID = "Chairperson is non-executive promoter or related (Min 50% Independent required)";
-  }
+    // Rule 2: Executive vs Non-Executive (Reg 17(1)(a))
+    // Board must have at least 50% non-executive directors
+    const halfDirectors = Math.ceil(totalDirectors / 2);
+    if (nonExecutiveDirectors < halfDirectors) {
+      errors.push(`Insufficient Non-Executive Directors. Current: ${nonExecutiveDirectors}. Required minimum: ${halfDirectors} (at least 50% of Board).`);
+    } else {
+      passes.push(`Non-Executive composition is valid (${nonExecutiveDirectors} / ${totalDirectors} are Non-Executive).`);
+    }
 
-  const requiredIDCount = Math.ceil(totalDirectors * requiredIDRatio);
-  if (independentDirectors < requiredIDCount) {
-    errors.push(`Insufficient Independent Directors. Current: ${independentDirectors}. Required: ${requiredIDCount} (${reasonID}).`);
-  } else {
-    passes.push(`Independent Director composition is valid (${independentDirectors} / ${totalDirectors} are independent. ${reasonID}).`);
+    // Rule 3: Woman Director and Independent Woman Director (Reg 17(1)(a))
+    // All listed entities: at least 1 woman director.
+    // Top 1000 listed entities: at least 1 independent woman director.
+    if (womenDirectors < 1) {
+      errors.push("Missing Woman Director. Every listed entity must have at least 1 woman director.");
+    } else {
+      passes.push(`Has ${womenDirectors} woman director(s).`);
+    }
+
+    if (isTop1000) {
+      if (independentWomenDirectors < 1) {
+        errors.push("Missing Independent Woman Director. Top 1000 listed entities must have at least 1 independent woman director.");
+      } else {
+        passes.push("Has at least 1 independent woman director (Top 1000 check passed).");
+      }
+    }
+
+    // Rule 4: Independent Directors ratio (Reg 17(1)(b))
+    // - If Chairperson is Regular Non-Executive (not promoter, not related to promoter): Min 1/3rd Independent
+    // - If Chairperson is Executive, or Regular Non-Executive but Promoter/Related: Min 50% Independent
+    let requiredIDRatio = 0.5;
+    let reasonID = "";
+    if (chairpersonType === "non_exec_regular") {
+      requiredIDRatio = 1 / 3;
+      reasonID = "Chairperson is non-executive & unrelated to promoters (Min 1/3rd Independent required)";
+    } else if (chairpersonType === "executive") {
+      requiredIDRatio = 0.5;
+      reasonID = "Chairperson is executive (Min 50% Independent required)";
+    } else if (chairpersonType === "non_exec_promoter") {
+      requiredIDRatio = 0.5;
+      reasonID = "Chairperson is non-executive promoter or related (Min 50% Independent required)";
+    }
+
+    const requiredIDCount = Math.ceil(totalDirectors * requiredIDRatio);
+    if (independentDirectors < requiredIDCount) {
+      errors.push(`Insufficient Independent Directors. Current: ${independentDirectors}. Required: ${requiredIDCount} (${reasonID}).`);
+    } else {
+      passes.push(`Independent Director composition is valid (${independentDirectors} / ${totalDirectors} are independent. ${reasonID}).`);
+    }
   }
 
   const isValid = errors.length === 0;

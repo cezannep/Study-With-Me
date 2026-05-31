@@ -39,7 +39,7 @@ function StaticRow({ word }: StaticRowProps) {
   );
 }
 
-function DashboardContent() {
+function DashboardContent({ initialAdminLoginOpen = false }: { initialAdminLoginOpen?: boolean }) {
   const {
     isMounted,
     authLoading,
@@ -50,7 +50,6 @@ function DashboardContent() {
     adminUsername,
     adminPassword,
     adminLoginError,
-    initialAdminLoginOpen,
     isSidebarOpen,
     activeSection,
     selectedDayId,
@@ -65,8 +64,7 @@ function DashboardContent() {
     setIsAdminLoginOpen,
     setAdminLoginError,
     setIsSidebarOpen,
-    handleSignOutFromAdminAuth,
-    handleEnterDemoMode
+    handleLogout
   } = useDashboardActions();
 
   if (!isMounted) {
@@ -104,7 +102,7 @@ function DashboardContent() {
           <div className="flex flex-col gap-4 text-left">
             {/* Step 1: Firebase Auth */}
             {!user ? (
-              <div className="p-4 bg-zinc-950 border border-zinc-850 space-y-3">
+              <div className="p-4 bg-zinc-955 border border-zinc-850 space-y-3">
                 <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block font-sans">Step 1: Database Authentication</span>
                 <button
                   type="button"
@@ -123,7 +121,7 @@ function DashboardContent() {
                   </p>
                   <button
                     type="button"
-                    onClick={handleSignOutFromAdminAuth}
+                    onClick={handleLogout}
                     className="text-[10px] text-red-400 hover:text-red-300 font-bold uppercase tracking-wider border-0 bg-transparent cursor-pointer font-sans shrink-0"
                   >
                     Switch Account
@@ -255,13 +253,6 @@ function DashboardContent() {
               </svg>
               <span>Sign in with Google ID</span>
             </button>
-            <button
-              onClick={handleEnterDemoMode}
-              id="bypass-auth-btn"
-              className="w-full py-3 px-4 bg-zinc-800 text-zinc-200 font-bold hover:bg-zinc-700 transition-colors shadow-sm cursor-pointer border border-zinc-700 rounded-none text-xs"
-            >
-              CONTINUE IN OFFLINE/DEMO MODE
-            </button>
           </div>
 
           <div className="text-[9px] text-zinc-500 font-mono tracking-wider uppercase">
@@ -329,7 +320,7 @@ interface DashboardProps {
 export default function Dashboard({ initialAdminLoginOpen = false }: DashboardProps = {}) {
   return (
     <DashboardProvider initialAdminLoginOpen={initialAdminLoginOpen}>
-      <DashboardContent />
+      <DashboardContent initialAdminLoginOpen={initialAdminLoginOpen} />
     </DashboardProvider>
   );
 }

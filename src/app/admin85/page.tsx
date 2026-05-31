@@ -1,7 +1,12 @@
 "use client";
 
-import Dashboard from "@/components/Dashboard";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default function AdminPage() {
-  return <Dashboard initialAdminLoginOpen={true} />;
+export default function RedirectPage() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace("/admin-login");
+  }, [router]);
+  return null;
 }

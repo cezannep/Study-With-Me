@@ -118,7 +118,7 @@ export default function PlannerSection() {
           <button
             type="button"
             onClick={() => {
-              setNewSlotDayId(selectedDayId);
+              setNewSlotDayId(selectedDayId as number);
               setIsAddSlotOpen(true);
             }}
             className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/95 transition-all shadow-xs shrink-0 cursor-pointer"

@@ -29,6 +29,7 @@ export interface UserProgress {
   timerPreset?: string;
   selectedDayId?: number;
   isTimerOnBreak?: boolean;
+  prevFocusPreset?: string;
 }
 
 const DEFAULT_PROGRESS: UserProgress = {
